@@ -25,9 +25,6 @@ jobs:
           key: node-modules-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             node-modules-${{ runner.os }}-
-      - name: get playwright version
-        id: playwright-version
-        run: echo "version=$(npx --no-install playwright --version)" >> $GITHUB_OUTPUT
       - name: cache playwright browsers
         id: cache-playwright-browsers
         uses: actions/cache@v4
@@ -59,9 +56,7 @@ jobs:
           retention-days: 30
       - name: deploy to Render
         if: ${{ github.event_name == 'push' && !env.COMMIT_CONTAINS_SKIP }}
-        run: curl https://api.render.com/deploy/srv-${{ secrets.RENDER_SERVICE_ID }}?key=${{ secrets.RENDER_API_KEY }}
-
-  
+        run: curl https://api.render.com/deploy/srv-${{ secrets.RENDER_SERVICE_ID }}?key=${{ secrets.RENDER_API_KEY }}  
   
   tag_release:
     needs: [simple_deployment_pipeline]
@@ -75,7 +70,7 @@ jobs:
           fetch-depth: '0'
       - if: ${{ github.event_name == 'push' && !env.COMMIT_CONTAINS_SKIP }}
         name: bump version & push tag
-        uses: anothrNick/github-tag-action@1.73.0
+        uses: anothrNick/github-tag-action@e528bc2b9628971ce0e6f823f3052d1dcd9d512c
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG_PREFIX: v
