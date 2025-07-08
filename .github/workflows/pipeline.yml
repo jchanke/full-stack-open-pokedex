@@ -62,7 +62,7 @@ jobs:
    
         # Discord notification 
       - name: discord notification (succcess)
-        if: ${{ steps.deploy-to-render.conclusion.success }}
+        if: steps.deploy-to-render.conclusion.success == 'true'
         run: echo ${{ toJSON(github.event.commit) }}
         # uses: rjstone/discord-webhook-notify@v2
         # with:
