@@ -9,7 +9,6 @@ on:
     types: [opened, synchronize]
 
 env:
-  COMMIT_MESSAGES: ${{ join(github.event.commits.*.message) }}
   COMMIT_CONTAINS_SKIP: ${{ contains(join(github.event.commits.*.message), '#skip') }}
 
 jobs:
@@ -59,7 +58,7 @@ jobs:
           path: playwright-report/
           retention-days: 30
       - name: deploy to Render
-        if: ${{ github.event_name == 'push' && !github.env.COMMIT_CONTAINS_SKIP }}
+        if: ${{ github.event_name == 'push' && !env.COMMIT_CONTAINS_SKIP }}
         run: curl https://api.render.com/deploy/srv-${{ secrets.RENDER_SERVICE_ID }}?key=${{ secrets.RENDER_API_KEY }}
   
   tag_release:
@@ -78,10 +77,3 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG_PREFIX: v
           DEFAULT_BUMP: patch
-
-  commit_contains_skip:
-    runs-on: ubuntu-22.04
-    steps:
-      - run: echo ${{ join(github.event.commits.*.message) }}
-      - run: echo 'joined commit messages:' ${{ env.COMMIT_MESSAGES }}
-      - run: echo 'commit message contains skip:' ${{ env.COMMIT_CONTAINS_SKIP }}
