@@ -82,5 +82,6 @@ jobs:
   commit_contains_skip:
     runs-on: ubuntu-22.04
     steps:
+      - run: echo ${{ join(github.event.commits.*.message) }}
       - run: echo 'joined commit messages:' ${{ github.env.COMMIT_MESSAGES }}
       - run: echo 'commit message contains skip:' ${{ github.env.COMMIT_CONTAINS_SKIP }}
