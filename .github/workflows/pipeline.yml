@@ -9,6 +9,7 @@ on:
     types: [opened, synchronize]
 
 env:
+  PRODUCTION_URL: https://fullstackopen-pokedex-6s9p.onrender.com/
   COMMIT_CONTAINS_SKIP: ${{ contains(join(github.event.commits.*.message), '#skip') }}
 
 jobs:
@@ -55,10 +56,29 @@ jobs:
           path: playwright-report/
           retention-days: 30
       - name: deploy to Render
+        id: deploy-to-render
         if: ${{ github.event_name == 'push' && !env.COMMIT_CONTAINS_SKIP }}
-        run: curl https://api.render.com/deploy/srv-${{ secrets.RENDER_SERVICE_ID }}?key=${{ secrets.RENDER_API_KEY }}  
-  
-  tag_release:
+        run: curl https://api.render.com/deploy/srv-${{ secrets.RENDER_SERVICE_ID }}?key=${{ secrets.RENDER_API_KEY }}
+   
+        # Discord notification 
+      - name: discord notification (succcess)
+        if: ${{ steps.deploy-to-render.conclusion.success }}
+        run: echo ${{ toJSON(github.event.commit) }}
+        # uses: rjstone/discord-webhook-notify@v2
+        # with:
+        #   webhookUrl: ${{ secrets.DISCORD_BOT_WEBHOOK }}
+        #   username: GitHub
+        #   avatarUrl: https://github.githubassets.com/assets/GitHub-Mark-ea2971cee799.png
+        #   severity: info
+        #   title: ✅ Pokedex deployed!
+        #   description: |
+        #     '***commit:*** ${{ toJSON(github.event.commit) }}'
+        #     '***view site:*** [${{ env.PRODUCTION_URL }}](${{ env.PRODUCTION_URL }})'
+        #   details: not needed because we overrode default description.
+        #   footer: This embed was brought to you by the letter R and the number 4.
+
+
+  tag_release:  
     needs: [simple_deployment_pipeline]
     runs-on: ubuntu-22.04
     permissions:
