@@ -2,3 +2,11 @@ dist/
 node_modules/
 
 .vscode/
+package-lock.json
+
+# Playwright
+/test-examples/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
