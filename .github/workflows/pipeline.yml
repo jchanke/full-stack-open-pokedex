@@ -15,17 +15,35 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
+      - name: cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+          key: node-modules-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            node-modules-${{ runner.os }}-
+      - name: get playwright version
+        id: playwright-version
+        run: echo "version=$(npx --no-install playwright --version)" >> $GITHUB_OUTPUT
+      - name: cache playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-browsers-${{ runner.os }}-${{ steps.playwright-version.outputs.version }}
+          restore-keys: |
+            playwright-browsers-${{ runner.os }}-
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
-      - run: npm install
+      - run: npm ci
       - name: lint
         run: npm run eslint
       - name: build
         run: npm run build
       - name: test
         run: npm run test
-      - name: install playwright Browsers
+      - name: install playwright browsers
         run: npx playwright install --with-deps
       - run: npm run test:e2e
       - uses: actions/upload-artifact@v4
