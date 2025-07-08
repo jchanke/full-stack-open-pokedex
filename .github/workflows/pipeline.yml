@@ -60,7 +60,7 @@ jobs:
         if: github.event_name == 'push' && env.COMMIT_CONTAINS_SKIP != 'true'
         run: curl https://api.render.com/deploy/srv-${{ secrets.RENDER_SERVICE_ID }}?key=${{ secrets.RENDER_API_KEY }}
    
-        # Discord notification 
+      # Discord notification (success)
       - name: discord notification (succcess)
         if: steps.deploy-to-render.outcome == 'success'
         uses: Ilshidur/action-discord@0c4b27844ba47cb1c7bee539c8eead5284ce9fa9
@@ -71,9 +71,25 @@ jobs:
         with:
           args: |
             ✅ Pokedex deployed!
-            ***by:*** ${{ join(github.event.commits.*.committer.username)}}
-            ***view site:*** ${{ env.PRODUCTION_URL }}
-            ***commit:*** ${{ join(github.event.commits.*.url) }}
+            **by:** ${{ join(github.event.commits.*.committer.username)}}
+            **view site:** ${{ env.PRODUCTION_URL }}
+            **commit:** ${{ join(github.event.commits.*.url) }}
+      
+      # Discord notification (failure)
+      - name: discord notification (failure)
+        if: steps.deploy-to-render.outcome != 'success'
+        uses: Ilshidur/action-discord@0c4b27844ba47cb1c7bee539c8eead5284ce9fa9
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_BOT_WEBHOOK }}
+          DISCORD_USERNAME: GitHub
+          DISCORD_AVATAR: https://github.githubassets.com/assets/GitHub-Mark-ea2971cee799.png
+        with:
+          args: |
+            ❌ build failed
+            **by:** ${{ join(github.event.commits.*.committer.username)}}
+            **view site:** ${{ env.PRODUCTION_URL }}
+            **commit:** ${{ join(github.event.commits.*.url) }}
+
 
   tag_release:  
     needs: [simple_deployment_pipeline]
