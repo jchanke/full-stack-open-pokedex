@@ -63,20 +63,19 @@ jobs:
         # Discord notification 
       - name: discord notification (succcess)
         if: steps.deploy-to-render.outcome == 'success'
-        run: echo ${{ toJSON(github.event.commits) }}
-        # uses: rjstone/discord-webhook-notify@v2
-        # with:
-        #   webhookUrl: ${{ secrets.DISCORD_BOT_WEBHOOK }}
-        #   username: GitHub
-        #   avatarUrl: https://github.githubassets.com/assets/GitHub-Mark-ea2971cee799.png
-        #   severity: info
-        #   title: ✅ Pokedex deployed!
-        #   description: |
-        #     '***commit:*** ${{ toJSON(github.event.commit) }}'
-        #     '***view site:*** [${{ env.PRODUCTION_URL }}](${{ env.PRODUCTION_URL }})'
-        #   details: not needed because we overrode default description.
-        #   footer: This embed was brought to you by the letter R and the number 4.
-
+        uses: rjstone/discord-webhook-notify@v2
+        with:
+          webhookUrl: ${{ secrets.DISCORD_BOT_WEBHOOK }}
+          username: GitHub
+          avatarUrl: https://github.githubassets.com/assets/GitHub-Mark-ea2971cee799.png
+          severity: info
+          title: ✅ Pokedex deployed!
+          description: |
+            ***by:*** ${{ join(github.event.commits.*.committer.username)}}
+          details: |
+            ***view site:*** ${{ env.PRODUCTION_URL }}
+          footer: |
+            ***commit:*** ${{ join(github.event.commits.*.url) }}
 
   tag_release:  
     needs: [simple_deployment_pipeline]
