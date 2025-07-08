@@ -57,7 +57,7 @@ jobs:
           retention-days: 30
       - name: deploy to Render
         id: deploy-to-render
-        if: ${{ github.event_name == 'push' && !env.COMMIT_CONTAINS_SKIP }}
+        if: github.event_name == 'push' && env.COMMIT_CONTAINS_SKIP != 'true'
         run: curl https://api.render.com/deploy/srv-${{ secrets.RENDER_SERVICE_ID }}?key=${{ secrets.RENDER_API_KEY }}
    
         # Discord notification 
@@ -84,11 +84,11 @@ jobs:
     permissions:
       contents: write
     steps:
-      - if: ${{ github.event_name == 'push' && !env.COMMIT_CONTAINS_SKIP }}
+      - if: github.event_name == 'push' && env.COMMIT_CONTAINS_SKIP != 'true'
         uses: actions/checkout@v4
         with:
           fetch-depth: '0'
-      - if: ${{ github.event_name == 'push' && !env.COMMIT_CONTAINS_SKIP }}
+      - if: github.event_name == 'push' && env.COMMIT_CONTAINS_SKIP != 'true'
         name: bump version & push tag
         uses: anothrNick/github-tag-action@e528bc2b9628971ce0e6f823f3052d1dcd9d512c
         env:
