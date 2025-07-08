@@ -9,6 +9,7 @@ on:
     types: [opened, synchronize]
 
 env:
+  COMMIT_MESSAGES: ${{ join(github.event.commits.*.message) }}
   COMMIT_CONTAINS_SKIP: ${{ contains(join(github.event.commits.*.message), '#skip') }}
 
 jobs:
@@ -77,3 +78,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG_PREFIX: v
           DEFAULT_BUMP: patch
+
+  commit_contains_skip:
+    runs-on: ubuntu-22.04
+    steps:
+      - run: echo 'joined commit messages:' ${{ github.env.COMMIT_MESSAGES }}
+      - run: echo 'commit message contains skip:' ${{ github.env.COMMIT_CONTAINS_SKIP }}
