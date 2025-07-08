@@ -63,7 +63,7 @@ jobs:
         # Discord notification 
       - name: discord notification (succcess)
         if: steps.deploy-to-render.outcome == 'success'
-        uses: rjstone/discord-webhook-notify@v2
+        uses: rjstone/discord-webhook-notify@v2.2.1
         with:
           webhookUrl: ${{ secrets.DISCORD_BOT_WEBHOOK }}
           username: GitHub
