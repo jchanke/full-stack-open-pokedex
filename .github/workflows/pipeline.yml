@@ -8,7 +8,8 @@ on:
     branches: [main]
     types: [opened, synchronize]
 
-    
+env:
+  COMMIT_CONTAINS_SKIP: ${{ contains(join(github.event.commits.*.message), '#skip') }}
 
 jobs:
   simple_deployment_pipeline:
@@ -57,11 +58,11 @@ jobs:
           path: playwright-report/
           retention-days: 30
       - name: deploy to Render
-        if: ${{ github.event_name == 'push' }}
+        if: ${{ github.event_name == 'push' && !github.env.COMMIT_CONTAINS_SKIP }}
         run: curl https://api.render.com/deploy/srv-${{ secrets.RENDER_SERVICE_ID }}?key=${{ secrets.RENDER_API_KEY }}
   
   tag_release:
-    if: ${{ github.event_name == 'push' }}
+    if: ${{ github.event_name == 'push' && !github.env.COMMIT_CONTAINS_SKIP }}
     needs: [simple_deployment_pipeline]
     runs-on: ubuntu-22.04
     permissions:
@@ -76,20 +77,3 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG_PREFIX: v
           DEFAULT_BUMP: patch
-
-  a_test_job:
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v4
-      - name: github context
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        run: echo "$GITHUB_CONTEXT"
-      - name: commits
-        env:
-          COMMITS: ${{ toJson(github.event.commits) }}
-        run: echo "$COMMITS"
-      - name: commit messages
-        env:
-          COMMIT_MESSAGES: ${{ toJson(github.event.commits.*.message) }}
-        run: echo "$COMMIT_MESSAGES"
