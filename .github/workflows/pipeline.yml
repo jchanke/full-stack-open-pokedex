@@ -63,18 +63,16 @@ jobs:
         # Discord notification 
       - name: discord notification (succcess)
         if: steps.deploy-to-render.outcome == 'success'
-        uses: rjstone/discord-webhook-notify@v2.2.1
+        uses: Ilshidur/action-discord@0c4b27844ba47cb1c7bee539c8eead5284ce9fa9
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_BOT_WEBHOOK }}
+          DISCORD_USERNAME: GitHub
+          DISCORD_AVATAR: https://github.githubassets.com/assets/GitHub-Mark-ea2971cee799.png
         with:
-          webhookUrl: ${{ secrets.DISCORD_BOT_WEBHOOK }}
-          username: GitHub
-          avatarUrl: https://github.githubassets.com/assets/GitHub-Mark-ea2971cee799.png
-          severity: info
-          title: ✅ Pokedex deployed!
-          description: |
+          args: |
+            ✅ Pokedex deployed!
             ***by:*** ${{ join(github.event.commits.*.committer.username)}}
-          details: |
             ***view site:*** ${{ env.PRODUCTION_URL }}
-          footer: |
             ***commit:*** ${{ join(github.event.commits.*.url) }}
 
   tag_release:  
