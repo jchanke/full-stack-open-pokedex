@@ -73,10 +73,10 @@ jobs:
           TAG_PREFIX: v
           DEFAULT_BUMP: patch
 
-  # notify_discord:
-  #   needs: [simple_deployment_pipeline, tag_release]
-  #   runs-on: ubuntu-22.04
-  #   steps:
+  notify_discord:
+    needs: [simple_deployment_pipeline, tag_release]
+    runs-on: ubuntu-22.04
+    steps:
   #     - name: notify (success)
   #       if: needs.tag_release.result == 'success'
   #       uses: sarisia/actions-status-discord@v1.15.3
@@ -87,6 +87,6 @@ jobs:
   #           **by:** ${{ join(github.event.commits.*.committer.username)}}
   #           **view site:** ${{ env.PRODUCTION_URL }}
   #           **commit:** ${{ join(github.event.commits.*.url) }}
-  #     - name: print commit info
-  #       run: echo '${{github.event.head_commit}}'
+      - name: print commit info
+        run: echo '${{github.event.head_commit}}'
       
